@@ -7,7 +7,6 @@ import sys
 from tkinter import Menu
 import tkinter as tk
 from tkinter import messagebox as msg
-# from potentiostat import Potentiostat
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
@@ -18,18 +17,25 @@ from tkinter import filedialog, dialog
 from time import sleep
 import scipy
 import os
-# from potentiostat_live_plot3 import *
 import potentiostat as ps
 import matplotlib.pyplot as plt
 import json
 import queue as Queue
-from Potentiosta_queue import *
+from .Potentiosta_queue import *
 from matplotlib import style
 
 style.use("ggplot")
 
 
 def handler(event, comb, frames):
+    """
+    A handler function to switch between frames based on the current selection in a Combobox.
+
+    Args:
+        event: The event triggering the handler.
+        comb (ttk.Combobox): The Combobox widget.
+        frames (list): A list of frame widgets to switch between.
+    """
     index = comb.current()
     for i in frames:
         i.grid_forget()
@@ -41,65 +47,114 @@ win = tk.Tk()
 
 # Add a title
 win.title("Electrochamical Potentiostat")
-# w = win.winfo_screenwidth()
-# h = win.winfo_screenheight()
+
 win.geometry("450x650+350+50")
+# Disable window resizing
 win.resizable(0,0)
 file_path = ''
+
 global number, number2, name, name1, name2, name3, name4, name5, name6, number7, number22, name24, name26, name28, name29, name211, number32, name34, \
     name36, name38, name39, name310, name312, number42, name44, name46, name48, name49, name410, name411, number52, name54, name56, \
     name58, name59, name511, name512, name513, name514, number62, name60, name61, name62, name63, name64, name65, name66, name67, checkVar1, \
     checkVar2, checkVar3, curr_unit,C_range
+###########################cyclic###################################
 C_range = tk.StringVar()
 number = tk.StringVar(value="cyclic")
 number2 = tk.StringVar(value='10-4')
+# sample_rate
 name = tk.IntVar(value="100")
+# quiet_time
 name1 = tk.IntVar(value="0")
+# quiet_value
 name2 = tk.DoubleVar(value="0")
+# volt_min
 name3 = tk.DoubleVar(value="-1")
+# volt_max
 name4 = tk.DoubleVar(value="1")
+# volt_per_sec
 name5 = tk.DoubleVar(value="0.5")
+# num_cycles
 name6 = tk.IntVar(value="1")
+# shift
 name7 = tk.DoubleVar(value="1")
+###########################constant voltage###################################
 number22 = tk.StringVar(value='10-4')
+# sample_rate
 name24 = tk.IntVar(value="100")
+# quiet_time
 name26 = tk.IntVar(value="0")
+# quiet_value
 name28 = tk.DoubleVar(value="0")
+# Output volatage (V) durring constant voltag
 name29 = tk.DoubleVar(value="0")
+# duration
 name211 = tk.IntVar(value="0")
+########################### chronoamperometry ###################################
 number32 = tk.StringVar(value='10-4')
+# sample_rate
 name34 = tk.IntVar(value="100")
+# quiet_time
 name36 = tk.IntVar(value="0")
+# quiet_value
 name38 = tk.DoubleVar(value="0")
+# duration1
 name39 = tk.IntVar(value="0")
+# value1
 name310 = tk.DoubleVar(value="0")
+# duration2
 name311 = tk.IntVar(value='0')
+# value2
 name312 = tk.DoubleVar(value="0")
 number42 = tk.StringVar(value='10-4')
+#############################linearSweep#######################
+# sample_rate
 name44 = tk.IntVar(value="0")
+# quiet_time
 name46 = tk.IntVar(value="0")
+# quiet_value
 name48 = tk.DoubleVar(value="0")
+# startValue
 name49 = tk.DoubleVar(value="0")
+# finalValue
 name410 = tk.DoubleVar(value="0")
+# duration
 name411 = tk.IntVar(value="0")
+##################################sinusoid test####################
 number52 = tk.StringVar(value='10-4')
+# sample_rate
 name54 = tk.IntVar(value="100")
+# quiet_time
 name56 = tk.IntVar(value="0")
+# quiet_value
 name58 = tk.DoubleVar(value="0")
+# num_cycles
 name59 = tk.IntVar(value="1")
+# amplitude
 name511 = tk.DoubleVar(value="0")
+# offset
 name512 = tk.DoubleVar(value="0")
+# shift
 name513 = tk.DoubleVar(value="0")
+# period
 name514 = tk.IntVar(value="0")
 
 number62 = tk.StringVar(value='10-4')
+###########################squareWave
+# sample_rate
 name60 = tk.IntVar(value="100")
+# name61
 name61 = tk.IntVar(value="0")
+# quiet_value
 name62 = tk.DoubleVar(value="0")
+# amplitude
 name63 = tk.DoubleVar(value="1")
+# startValue
 name64 = tk.DoubleVar(value="0")
+# finalValue
 name65 = tk.DoubleVar(value="0")
+# stepValue
 name66 = tk.DoubleVar(value="0")
+# window
 name67 = tk.DoubleVar(value="0")
 
 checkVar1 = tk.IntVar()
@@ -107,20 +162,23 @@ checkVar2 = tk.IntVar()
 checkVar3 = tk.IntVar()
 
 
-# def saveData():
+
 
 def savefile():
+    """
+    Function to prompt user to save a file and store the selected file path in a global variable file_path.
+
+    This function opens a file dialog to allow the user to select a file path for saving data. The selected
+    file path is stored in the global variable file_path for later use.
+
+    """
     global file_path
     file_path = filedialog.asksaveasfilename(title=u'Save file')
     if file_path is not None:
         dialog.Dialog(None, {'title': 'File Modified', 'text': 'Save file', 'bitmap': 'warning', 'default': 0,
                              'strings': ('OK', 'Cancle')})
-        #        sf2=datatfile1.get('1.0',tk.END)
-
-        #        a1=tk.String(sf)
     val = file_path
     val1.set(val)
-
 
 tabControl = ttk.Notebook(win)
 tab1 = ttk.Frame(tabControl)
@@ -141,8 +199,6 @@ def run_potentiostat():
         num_cycles = name6.get()
         volt_lims = [volt_min, volt_max]
         curr_range = C_range_chosen.get()
-        # cur = int(curr_range[:-2])
-        # curr_lims = [-cur, cur]
         curr_unit = curr_range[-2:]
         shift = name7.get()  # Waveform phase shift - expressed as [0,1] number
         if curr_range == "100nA" or curr_range == "60nA":
@@ -157,9 +213,6 @@ def run_potentiostat():
         elif volt_max > 10 or volt_max < -10:
             msg.showerror('Python Message Error Box',
                           "\nError: The V_end value should be between -10 to 10 V ")
-       #elif volt_min > volt_max:
-       #     msg.showerror('Python Message Error Box',
-       #                   '\nError: The V_init value should be smaller than V_end ')
         elif sample_rate == 0:
             msg.showerror('Python Message Error Box',
                           '\nError: please input the sample rate ')
@@ -1268,8 +1321,9 @@ def _quit():
 
 
 def _msgBox0():
+    # Function to display an About message box
     msg.showinfo('', 'Welcome to use this smart Electrochemical Potentiostat!'
-                     '\n If any question, please contact aqchen@hdu.edu.cn.')
+                     '\n If any question, please contact Hydrogen Energy and Carbon Neutrality Laboratory Hangzhou Dianzi University')
 
 
 # Creating a Menu Bar
@@ -1287,9 +1341,6 @@ menu_bar.add_cascade(label="File", menu=file_menu)
 help_menu = Menu(menu_bar, tearoff=0)
 help_menu.add_command(label="About", command=_msgBox0)
 menu_bar.add_cascade(label="Help", menu=help_menu)
-
-# name_entered.focus()  # Place cursor into name Entry
-
 
 win.mainloop()
 
